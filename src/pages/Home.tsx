@@ -21,50 +21,50 @@ import {
 import { motion } from 'motion/react';
 import exampleImage from "@/assets/exampleImage.png";
 import logoImage from "@/assets/logoImage.png";
+import { useNavigate } from "react-router-dom";
 
 // Hero Section
 const Hero = () => {
+  const navigate = useNavigate(); // Add this hook
+
   return (
-    <section className="relative bg-slate-50 overflow-hidden pt-32 pb-20 lg:pt-40 lg:pb-28">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-          <div className="flex-1 text-center lg:text-left">
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 tracking-tight mb-6"
-            >
-              Legacy Documentation <span className="text-emerald-700">Explorer</span>
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-lg sm:text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0"
-            >
-              Welcome to the auto-generated documentation for the multi-repository legacy application system.
-            </motion.p>
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
-            >
-              <button className="bg-emerald-800 hover:bg-emerald-900 text-white font-medium py-3 px-8 rounded-lg transition-colors flex items-center justify-center gap-2">
-                Explore Documentation
-                <Search size={18} />
-              </button>
-              <button className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-3 px-8 rounded-lg transition-colors">
-                View Repositories
-              </button>
-            </motion.div>
-          </div>
+    <section className="pt-24 pb-16 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-900 text-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row items-center gap-12">
           <motion.div 
+            className="flex-1 text-center lg:text-left"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+              Comprehensive API Documentation
+            </h1>
+            <p className="text-xl sm:text-2xl text-emerald-100 mb-8 max-w-2xl mx-auto lg:mx-0">
+              Explore 4,500+ auto-generated documentation files from our Backend, Frontend, and CMS repositories.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              {/* UPDATED: Navigate to Documentation page */}
+              <button 
+                onClick={() => navigate('/docs')}
+                className="bg-white text-emerald-900 hover:bg-emerald-50 font-bold py-3 px-8 rounded-lg text-lg shadow-lg transition-all transform hover:scale-105"
+              >
+                Browse Documentation
+              </button>
+              <button 
+                onClick={() => navigate('/overview')}
+                className="bg-emerald-700 hover:bg-emerald-600 text-white font-medium py-3 px-8 rounded-lg text-lg transition-colors"
+              >
+                View Overview
+              </button>
+            </div>
+          </motion.div>
+          
+          <motion.div 
+            className="flex-1 w-full max-w-2xl"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex-1 w-full max-w-lg lg:max-w-none"
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
               <div className="absolute top-0 left-0 right-0 h-8 bg-slate-100 border-b border-slate-200 flex items-center px-4 gap-2">
@@ -339,10 +339,11 @@ const Footer = () => {
 // Main App Component
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate(); // Add this
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-      {/* Navigation */}
+      {/* Navigation - UPDATED */}
       <nav className="fixed top-0 w-full z-50 bg-emerald-900 text-white shadow-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -350,10 +351,18 @@ export default function Home() {
               <img src={logoImage} alt="Inspired Pet Nutrition" className="h-10 w-auto object-contain" />
             </div>
             
+            {/* Desktop Navigation - UPDATED */}
             <div className="hidden md:flex items-center gap-8">
               <a href="/home" className="text-sm font-medium text-emerald-100 hover:text-white transition-colors">Home</a>
               <a href="/overview" className="text-sm font-medium text-emerald-100 hover:text-white transition-colors">Overview</a>
               <a href="/explore" className="text-sm font-medium text-emerald-100 hover:text-white transition-colors">Explorer</a>
+              {/* NEW: Documentation Link */}
+              <button 
+                onClick={() => navigate('/docs')}
+                className="text-sm font-medium text-emerald-100 hover:text-white transition-colors"
+              >
+                Documentation
+              </button>
               <button className="bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded transition-colors">
                 Sign In
               </button>
@@ -373,13 +382,20 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Mobile Menu */}
+        {/* Mobile Menu - UPDATED */}
         {isMenuOpen && (
           <div className="md:hidden bg-emerald-800 border-t border-emerald-700">
             <div className="px-4 pt-2 pb-4 space-y-1">
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-emerald-700">Home</a>
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-emerald-100 hover:text-white hover:bg-emerald-700">Overview</a>
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-emerald-100 hover:text-white hover:bg-emerald-700">Explorer</a>
+              <a href="/home" className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-emerald-700">Home</a>
+              <a href="/overview" className="block px-3 py-2 rounded-md text-base font-medium text-emerald-100 hover:text-white hover:bg-emerald-700">Overview</a>
+              <a href="/explore" className="block px-3 py-2 rounded-md text-base font-medium text-emerald-100 hover:text-white hover:bg-emerald-700">Explorer</a>
+              {/* NEW: Documentation Link */}
+              <button 
+                onClick={() => navigate('/docs')}
+                className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-emerald-100 hover:text-white hover:bg-emerald-700"
+              >
+                Documentation
+              </button>
             </div>
           </div>
         )}
@@ -396,6 +412,5 @@ export default function Home() {
       <Footer />
     </div>
   );
-};
-
+}
 // export default Home;

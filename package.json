@@ -4,8 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "dev": "vite"
+    "generate-docs": "node scripts/generateDocsData.js",
+    "dev": "npm run generate-docs && vite",
+    "build": "npm run generate-docs && tsc && vite build"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
