@@ -6,7 +6,7 @@
   "scripts": {
     "generate-docs": "node scripts/generateDocsData.js",
     "dev": "npm run generate-docs && vite",
-    "build": "npm run generate-docs && tsc && vite build"
+    "build": "npm run generate-docs && vite build"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
