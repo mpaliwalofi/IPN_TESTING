@@ -1,7 +1,11 @@
-// Firebase Configuration using Environment Variables
-// Values are loaded from .env file 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-export const firebaseConfig = {
+// Your web app's Firebase configuration
+// TODO: Replace with your actual Firebase config
+const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
@@ -10,23 +14,13 @@ export const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-// Validate that all required environment variables are present
-const requiredEnvVars = [
-  'VITE_FIREBASE_API_KEY',
-  'VITE_FIREBASE_AUTH_DOMAIN',
-  'VITE_FIREBASE_PROJECT_ID',
-  'VITE_FIREBASE_STORAGE_BUCKET',
-  'VITE_FIREBASE_MESSAGING_SENDER_ID',
-  'VITE_FIREBASE_APP_ID'
-];
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-const missingEnvVars = requiredEnvVars.filter(
-  varName => !import.meta.env[varName]
-);
+// Initialize Firebase Authentication and get a reference to the service
+export const auth = getAuth(app);
 
-if (missingEnvVars.length > 0) {
-  console.error('Missing required environment variables:', missingEnvVars);
-  console.error('Please check your .env file');
-}
+// Initialize Cloud Firestore and get a reference to the service
+export const db = getFirestore(app);
 
-export default firebaseConfig;
+export default app;

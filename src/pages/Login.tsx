@@ -1,37 +1,53 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import pawPrint from "@/assets/paw-print.png";
 import dogImage from "@/assets/dog.png";
-import { authService } from "@/services/authService";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
+    setIsLoading(true);
 
-    const result = await authService.login(email, password);
-
-    if (result.success) {
-      // Redirect to home on successful login
-      navigate("/home");
-    } else {
-      setError(result.error || "Login failed. Please try again.");
+    // Simple validation
+    if (!email || !password) {
+      setError("Please enter both email and password");
+      setIsLoading(false);
+      return;
     }
 
-    setLoading(false);
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Attempt login with Firebase
+      await login(email, password);
+      // Navigate to home on success
+      navigate("/home");
+    } catch (err: any) {
+      setError(err.message || "Failed to sign in");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen w-full flex">
       {/* Left Side - Form */}
-      <div className="w-1/2 p-16 flex flex-col justify-center bg-white">
+      <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center bg-white">
         <div className="max-w-md mx-auto w-full">
           {/* Header */}
           <div className="mb-12">
@@ -47,15 +63,15 @@ export default function Login() {
             <p className="text-slate-500">
               Sign in to access{" "}
               <span className="font-medium text-emerald-700">
-                Upd Legacy Documentation
+                IPN Legacy Documentation
               </span>
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-              {error}
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
@@ -64,7 +80,7 @@ export default function Login() {
             {/* Email */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">
-                Email
+                Email Address
               </label>
               <div className="relative">
                 <input
@@ -72,8 +88,9 @@ export default function Login() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                  className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none focus:border-emerald-500 transition-all"
+                  disabled={isLoading}
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -89,51 +106,55 @@ export default function Login() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                  className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none focus:border-emerald-500 transition-all"
+                  disabled={isLoading}
+                  autoComplete="current-password"
                 />
               </div>
             </div>
 
             {/* Remember + Forgot */}
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="accent-emerald-600" />
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" className="accent-emerald-600 cursor-pointer" />
                 <span className="text-slate-600">Remember me</span>
               </label>
-              <button 
-                type="button"
-                className="text-emerald-700 hover:underline"
-              >
+              <a href="#" className="text-emerald-700 hover:underline">
                 Forgot password?
-              </button>
+              </a>
             </div>
 
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading}
-              className={`w-full py-4 bg-gradient-to-r from-emerald-700 to-emerald-600 text-white rounded-xl font-medium shadow-lg transition-all ${
-                loading 
-                  ? 'opacity-50 cursor-not-allowed' 
-                  : 'hover:shadow-xl hover:scale-[1.02]'
-              }`}
+              disabled={isLoading}
+              className="w-full py-4 bg-gradient-to-r from-emerald-700 to-emerald-600 text-white rounded-xl font-medium shadow-lg hover:from-emerald-800 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98]"
             >
-              {loading ? "Signing In..." : "Sign In"}
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing in...
+                </span>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
 
           <div className="mt-8 text-center text-sm text-slate-500">
             Don't have an account?{" "}
-            <a className="text-emerald-700 font-medium" href="#">
+            <span className="text-emerald-700 font-medium">
               Contact Administrator
-            </a>
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Right Side - Keep existing design */}
-      <div className="w-1/2 bg-gradient-to-br from-emerald-50 to-teal-50 relative flex items-center justify-center overflow-hidden">
+      {/* Right Side */}
+      <div className="hidden md:flex w-1/2 bg-gradient-to-br from-emerald-50 to-teal-50 relative items-center justify-center overflow-hidden">
         {/* Decorative paw prints */}
         {[...Array(8)].map((_, i) => (
           <img
@@ -152,7 +173,7 @@ export default function Login() {
         {/* Branding */}
         <div className="absolute top-12 text-center">
           <div className="text-5xl font-extralight text-emerald-800">
-            Upd Legacy
+            IPN Legacy
           </div>
           <div className="text-lg font-light text-emerald-600 tracking-widest uppercase opacity-70">
             Documentation
