@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import logoImage from "@/assets/logoImage.png";
+import { authService } from "@/services/authService";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -16,6 +20,11 @@ export default function Navigation() {
     { path: "/explore", label: "EXPLORER" },
     { path: "/docs", label: "DOCUMENTATION" },
   ];
+
+  const handleLogout = async () => {
+    await authService.logout();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-[#004536] text-white shadow">
@@ -50,11 +59,6 @@ export default function Navigation() {
                 {link.label}
               </button>
             ))}
-
-            {/* Sign In */}
-            <button className="ml-6 bg-[#0b5d46] hover:bg-[#0e6f54] text-white text-sm font-semibold px-5 py-2 rounded-md transition-colors">
-              SIGN IN
-            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -70,32 +74,37 @@ export default function Navigation() {
       </div>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-[#004536] border-t border-emerald-800">
-          <div className="px-6 py-4 space-y-2">
-            {navLinks.map((link) => (
-              <button
-                key={link.path}
-                onClick={() => {
-                  navigate(link.path);
-                  setIsMenuOpen(false);
-                }}
-                className={`block w-full text-left px-4 py-3 rounded-md text-sm font-semibold transition-colors ${
-                  isActive(link.path)
-                    ? "bg-emerald-800 text-white"
-                    : "text-emerald-200 hover:bg-emerald-800 hover:text-white"
-                }`}
-              >
-                {link.label}
-              </button>
-            ))}
-
-            <button className="w-full mt-3 bg-[#0b5d46] hover:bg-[#0e6f54] text-white py-3 rounded-md text-sm font-semibold">
-              SIGN IN
-            </button>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden bg-emerald-800 border-t border-emerald-700 overflow-hidden"
+          >
+            <div className="px-4 py-4 space-y-2">
+              {navLinks.map((link) => (
+                <motion.button
+                  key={link.path}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    navigate(link.path);
+                    setIsMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium transition-all ${
+                    isActive(link.path)
+                      ? "bg-emerald-700 text-white"
+                      : "text-emerald-100 hover:text-white hover:bg-emerald-700/50"
+                  }`}
+                >
+                  {link.label}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

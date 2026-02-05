@@ -1,7 +1,33 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import pawPrint from "@/assets/paw-print.png";
 import dogImage from "@/assets/dog.png";
+import { authService } from "@/services/authService";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const result = await authService.login(email, password);
+
+    if (result.success) {
+      // Redirect to home on successful login
+      navigate("/home");
+    } else {
+      setError(result.error || "Login failed. Please try again.");
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen w-full flex">
       {/* Left Side - Form */}
@@ -26,18 +52,28 @@ export default function Login() {
             </p>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Form */}
-          <form className="space-y-6">
-            {/* Username */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">
-                Username
+                Email
               </label>
               <div className="relative">
                 <input
-                  type="text"
-                  placeholder="Enter your username"
-                  className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
                 />
               </div>
             </div>
@@ -51,7 +87,10 @@ export default function Login() {
                 <input
                   type="password"
                   placeholder="Enter your password"
-                  className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
                 />
               </div>
             </div>
@@ -62,22 +101,30 @@ export default function Login() {
                 <input type="checkbox" className="accent-emerald-600" />
                 <span className="text-slate-600">Remember me</span>
               </label>
-              <a href="#" className="text-emerald-700 hover:underline">
+              <button 
+                type="button"
+                className="text-emerald-700 hover:underline"
+              >
                 Forgot password?
-              </a>
+              </button>
             </div>
 
             {/* Submit */}
             <button
               type="submit"
-              className="w-full py-4 bg-gradient-to-r from-emerald-700 to-emerald-600 text-white rounded-xl font-medium shadow-lg"
+              disabled={loading}
+              className={`w-full py-4 bg-gradient-to-r from-emerald-700 to-emerald-600 text-white rounded-xl font-medium shadow-lg transition-all ${
+                loading 
+                  ? 'opacity-50 cursor-not-allowed' 
+                  : 'hover:shadow-xl hover:scale-[1.02]'
+              }`}
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 
           <div className="mt-8 text-center text-sm text-slate-500">
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <a className="text-emerald-700 font-medium" href="#">
               Contact Administrator
             </a>
@@ -85,7 +132,7 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Right Side */}
+      {/* Right Side - Keep existing design */}
       <div className="w-1/2 bg-gradient-to-br from-emerald-50 to-teal-50 relative flex items-center justify-center overflow-hidden">
         {/* Decorative paw prints */}
         {[...Array(8)].map((_, i) => (
