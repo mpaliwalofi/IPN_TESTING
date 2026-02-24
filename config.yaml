@@ -1,0 +1,82 @@
+# =============================================================================
+#  config.yaml — Documentation Updater Configuration
+#  Project: IPN-FRONTEND
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# GitHub Integration
+# ---------------------------------------------------------------------------
+github:
+  repo_url: "https://github.com/mpaliwalofi/IPN_TESTING.git"   # ← replace with your actual GitHub repo URL
+  branch: "main"
+  token: ""                                                # leave blank — loaded from .env (GITHUB_TOKEN)
+  state_file: ".last_sync"
+  changelog_dir: "CHANGELOG_LOG"
+
+# ---------------------------------------------------------------------------
+# Source Repositories to Document
+# ---------------------------------------------------------------------------
+repositories:
+  - name: "ipn-frontend"
+    url: "https://github.com/mpaliwalofi/IPN_TESTING.git"       # ← same as above
+    local_path: "./repo_src/ipn-frontend"
+    type: "frontend"
+
+# ---------------------------------------------------------------------------
+# Output Directory (where generated .md docs are written)
+# ---------------------------------------------------------------------------
+output_dir: "./docs_output"
+
+# ---------------------------------------------------------------------------
+# Exclude Patterns (any file path containing these strings is skipped)
+# ---------------------------------------------------------------------------
+exclude:
+  - "node_modules"
+  - ".git"
+  - "dist"
+  - "build"
+  - ".next"
+  - "coverage"
+  - "__pycache__"
+  - ".venv"
+  - "venv"
+  - "vendor"
+  - ".cache"
+  - "public/assets"
+
+# ---------------------------------------------------------------------------
+# AI Enhancement via Groq
+# Groq is OpenAI-compatible, so we use provider: groq
+# ---------------------------------------------------------------------------
+ai_enhancement:
+  enabled: true
+  provider: "groq"
+  api_key: ""                                              # leave blank — loaded from .env (GROQ_API_KEY)
+  base_url: "https://api.groq.com/openai/v1"
+  model: "llama3-70b-8192"                                 # fast & capable; alternatives: mixtral-8x7b-32768
+  max_tokens: 2048
+  temperature: 0.3
+  # What AI should do when regenerating a doc
+  system_prompt: |
+    You are a senior software documentation engineer.
+    Given parsed source code metadata, write clear, concise Markdown documentation.
+    Include: purpose, key functions/components, parameters, return values, and usage examples.
+    Be direct and developer-focused. Avoid filler phrases.
+
+# ---------------------------------------------------------------------------
+# Functional Scopes (optional — maps repo names to domain areas)
+# Helps the AI understand what each part of the codebase does.
+# ---------------------------------------------------------------------------
+functional_scopes:
+  ipn-frontend:
+    type: "frontend"
+    framework: "Vue / TypeScript"
+    description: "IPN customer-facing frontend application"
+    areas:
+      - "src/components"
+      - "src/views"
+      - "src/store"
+      - "src/router"
+      - "src/composables"
+      - "src/utils"
+      - "src/api"
